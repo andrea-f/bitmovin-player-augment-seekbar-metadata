@@ -19,7 +19,7 @@ There are 5 steps to follow:
 The demo of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
 
 # Step 1
-Encode the video in DASH and HLS, create a JSON object to hold the extra metadata.
+Encode the MP4 video in DASH and HLS containers, create a JSON object to hold the extra metadata.
 
 ### 1.1 Separate video and audio tracks:
 
@@ -46,8 +46,11 @@ Using Shaka:
   --mpd_output manifest.mpd \
 ```
 
+### 1.4 Encode with Bitmovin!
 
-### 1.4 Serve the content
+Follow the interactive step-by-step encoding process here: https://bitmovin.com/dashboard/encoding/create/vod
+
+### 1.5 Serve the content
 
 Serve the content locally from `localhost` or upload the content on S3 (make sure to set CORS accordingly to accept all headers otherwise for audio and video files it will result in a CORS error).
 In permissions, set CORS configuration for bucket:
