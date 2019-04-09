@@ -10,13 +10,13 @@ There are 5 steps to follow:
 
 2. Load the input data and the player with config information.
 
-3. Listen to the Ready event and add markers on the seek bar.
+3. Listen to the `Ready` event and add markers on the seek bar.
 
-4. Listen to TimeChanged events and display a label with extra information if its near or on the highlighted event in the content.
+4. Listen to `TimeChanged` events and display a label with extra information if its near or on the highlighted event in the content.
 
 5. Fire mouseover event when the label is displayed to show the control bar with the highlighted event.
 
-The demo of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
+The **demo** of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
 
 ## Step 1
 Encode the MP4 video in DASH and HLS containers, create a JSON object to hold the extra metadata.
@@ -29,12 +29,14 @@ Separate video and audio tracks to create input files for packager:
 
 
 Create HLS manifest, using FFMPEG:
+
 ```
 ffmpeg -i LAZIO3roma0.mp4 -profile:v baseline -level 3.0 -s 1920x1080 -start_number 0 -hls_time 10 -hls_list_size 0 -f hls index.m3u8
 ```
 
 
 Create DASH manifest, using Shaka Packager:
+
 ```
 ./packager \
   in=LAZIO3roma0_audio.mp4,stream=audio,init_segment=audio.mp4 \
@@ -42,9 +44,7 @@ Create DASH manifest, using Shaka Packager:
   --mpd_output manifest.mpd \
 ```
 
-**Or encode with Bitmovin!**
-
-Follow the interactive step-by-step encoding process here: https://bitmovin.com/dashboard/encoding/create/vod
+**Or encode with Bitmovin!** Follow the interactive step-by-step encoding process here: https://bitmovin.com/dashboard/encoding/create/vod
 
 Once the video has been encoded and packaged, serve the content locally from `localhost` or upload the content on S3 (make sure to set CORS accordingly to accept all headers otherwise for audio and video files it will result in a CORS error).
 In permissions, set CORS configuration for bucket:
@@ -115,26 +115,6 @@ In a separate file, `bitmovin_credentials.json`, place the Bitmovin API License 
 {
     "license_key": "<BITMOVIN API LICENSE KEY>",
     "analytics_key": "<BITMOVIN ANALYTICS API KEY>"
-}
-```
-
-Load the JSON files via XHR:
-
-```
-function loadData (url) {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType("application/json");
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                resolve(JSON.parse(xhr.responseText));
-            } else if (xhr.status >= 400) {
-                reject({error: "Couldn't fetch " + url + " error status: " + xhr.status});
-            }
-        };
-        xhr.send(null);
-    })
 }
 ```
 
@@ -282,41 +262,40 @@ player.on(bitmovin.player.PlayerEvent.TimeChanged, function (event) {
 	[…]
 ```
 
-Create highlighted events in seconds by looping through the `items`' `play_event` key in the input:
+Create highlighted events in seconds by looping through the `items`' `play_event` key in the input. Then, handle whether to display a label in a specific time range. Check if the current time is within `labelTimeRange` seconds either before or after the highlighted events' time.
+If the current time is within the marker range, update the seek bar and pop up the control bar to show the label with the extra metadata information:
 
 ```
-for (var i = 0; i < data.play_events.length; i++) {
-    var playEvent = data.play_events[i];
-```
-
-Handle whether to display a label in a specific time range. Check if the current time is within `labelTimeRange` seconds either before or after the highlighted events' time.
-If the current time is within the marker range, update the seek bar at the events’ time and pop up the control bar to show the label with extra metadata information.
-
-```
-if (Math.abs(currentTime - playEvent) < labelTimeRange) {
-    var
-        seekBarLabelPosition = (playEvent * 100) / player.getDuration(), // Convert time to %
-        seekBarLabelConfig = {
-            playEvent: data.items[i].minute,
-            labelPosition: seekBarLabelPosition,
-            text: data.items[i].text
-        };
-    showingLabel = true;
-    // Update the seek bar ui for the whole time the play event is displayed
-    // So hover event keeps firing and seek bar is shown to the user
-    updateSeekbarUI(seekBarLabelConfig);
-    break;
-} else {
-    if (showingLabel === true) {
-        updateSeekbarUI();
-        showingLabel = false; 
+for (var i = 0; i < data.items.length; i++) {
+    var playEvent = data.items[i].play_event;
+    // If the current time is within `labelTimeRange` of a seekable event
+    // show the label and update the UI before and after the play event.
+    if (Math.abs(currentTime - playEvent) < labelTimeRange) {
+        var
+            seekBarLabelPosition = (playEvent * 100) / player.getDuration(),
+            seekBarLabelConfig = {
+                playEvent: data.items[i].minute,
+                labelPosition: seekBarLabelPosition,
+                text: data.items[i].text
+            };
+        showingLabel = true;
+        // Update the seek bar ui for the whole time the play event is displayed
+        // So hover event keeps firing and seek bar is shown to the user
+        updateSeekbarUI(seekBarLabelConfig);
+        break;
+    } else {
+        if (showingLabel === true) {
+            updateSeekbarUI();
+            showingLabel = false; 
+            }
+        }
     }
-}
+});
 ```
 
 
-Get relevant player UI elements and update the seek bar to show the label with the extra metadata information.
-Define the references to Bitmovin player UI elements:
+Get the player UI elements and update the seek bar to show the label with the extra metadata information:
+
 ```
 var
     seekbarLabel = document.querySelector(CSS_CLASSES.SEEKBAR_LABEL),
@@ -365,7 +344,11 @@ var event = new Event('mouseenter', {
 });
 ```
 
-Dispatch the event from `updateSeekbarUI` while the label is displayed: `seekbarControlBar.dispatchEvent(event);`.
+Dispatch the event from `updateSeekbarUI` while the label is displayed: 
+
+```
+seekbarControlBar.dispatchEvent(event);
+```
 
 
 # Demo and code
