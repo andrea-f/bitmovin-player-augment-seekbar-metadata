@@ -15,7 +15,8 @@ There are 5 steps to follow:
 4. Listen to TimeChanged events and display a label with extra information if its near or on the highlighted event in the content.
 
 5. Fire mouseover event when the label is displayed to show the control bar with the highlighted event.
-The complete code is available here:
+
+The demo of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
 
 # Step 1
 Encode the video in DASH and HLS, create a JSON object to hold the extra metadata.
@@ -132,6 +133,8 @@ function loadData (url) {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 resolve(JSON.parse(xhr.responseText));
+            } else if (xhr.status >= 400) {
+                reject({error: "Couldn't fetch " + url + " error status: " + xhr.status});
             }
         };
         xhr.send(null);
@@ -162,12 +165,16 @@ Call the main method `loadBitmovinPlayerWithConfig` with the loaded input data a
 document.addEventListener("DOMContentLoaded", function (event) {
     // Load the input data
     loadData(jsonData).then( data => {
-        // Then the players' config
+        // Then the players' config credentials
         loadData(bitmovinCredentials).then( credentials => {
             data.bitmovin_credentials = credentials;
-            // Then the player
+            // Then the player with the extended metadata in the seek bar
             loadBitmovinPlayerWithConfig(data);
+        }).catch(err => {
+            console.log('ERROR:', err.error);
         })
+    }).catch( err => {
+        console.log('ERROR:', err.error);
     })
 });
 ```
@@ -227,7 +234,9 @@ var playerContainer = document.getElementById('player');
 
 # Step 3 
 Listen to `Ready` event and add markers on the seek bar.
+
 Documentation with all Bitmovin player events: https://bitmovin.com/docs/player/api-reference/web/web-sdk-api-reference-v8#/player/web/8/docs/enums/core_events.playerevent.html
+
 Documentation with all Bitmovin CSS classes: https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
 
 ### 3.1 Listen to Ready event
@@ -381,7 +390,8 @@ var event = new Event('mouseenter', {
 Dispatch the event from `updateSeekbarUI` while the label is displayed: `seekbarControlBar.dispatchEvent(event);`.
 
 
-See the code in action at: 
+# Demo and code
+See the code in action at: https://s3.amazonaws.com/test-videos-samples/index.html, the video used is from Lazio - Roma 3 - 0 last March.
 
-The full code is available here:
+The full code is available here: https://github.com/andrea-f/bitmovin-player-augment-seekbar-metadata
 
