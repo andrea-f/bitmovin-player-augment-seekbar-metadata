@@ -1,7 +1,7 @@
 
 
 
-# Modify bitmovin player to handle metadata during playback in 5 main steps.
+# Modify bitmovin player to handle metadata during playback in 5 steps.
 
 The goal of this tutorial is to modify the Bitmovin player seek bar adding extra, seekable highlighted events in the content, using JS/CSS and HTML. 
 There are 5 steps to follow:
@@ -18,27 +18,23 @@ There are 5 steps to follow:
 
 The demo of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
 
-# Step 1
+## Step 1
 Encode the MP4 video in DASH and HLS containers, create a JSON object to hold the extra metadata.
 
-### 1.1 Separate video and audio tracks:
+Separate video and audio tracks to create input files for packager:
 
 `ffmpeg -i LAZIO3roma0.mp4 -vcodec libx264 LAZIO3roma0_video.mp4 -s 1920x1080 -r 24 -g 72`
 
 `ffmpeg -i LAZIO3roma0.mp4 -map 0:2 -c copy LAZIO3roma0_audio.mp4`
 
 
-### 1.2 Create HLS manifest
-
-Using FFMPEG:
+Create HLS manifest, using FFMPEG:
 ```
 ffmpeg -i LAZIO3roma0.mp4 -profile:v baseline -level 3.0 -s 1920x1080 -start_number 0 -hls_time 10 -hls_list_size 0 -f hls index.m3u8
 ```
 
 
-### 1.3 Create DASH manifest
-
-Using Shaka:
+Create DASH manifest, using Shaka Packager:
 ```
 ./packager \
   in=LAZIO3roma0_audio.mp4,stream=audio,init_segment=audio.mp4 \
@@ -46,13 +42,11 @@ Using Shaka:
   --mpd_output manifest.mpd \
 ```
 
-### 1.4 Encode with Bitmovin!
+**Or encode with Bitmovin!**
 
 Follow the interactive step-by-step encoding process here: https://bitmovin.com/dashboard/encoding/create/vod
 
-### 1.5 Serve the content
-
-Serve the content locally from `localhost` or upload the content on S3 (make sure to set CORS accordingly to accept all headers otherwise for audio and video files it will result in a CORS error).
+Once the video has been encoded and packaged, serve the content locally from `localhost` or upload the content on S3 (make sure to set CORS accordingly to accept all headers otherwise for audio and video files it will result in a CORS error).
 In permissions, set CORS configuration for bucket:
 
 
@@ -70,11 +64,10 @@ In permissions, set CORS configuration for bucket:
 ```
 
 
-# Step 2
+## Step 2
 Load the input data and the player with config information.
 
-### 2.1 Create input config
-Define an object, in `data.json` containing  the extra metadata information and the content references, for example:
+Create the input config. Define an object, in `data.json` containing  the extra metadata information and the content references, for example:
 
 ```
 {
@@ -182,8 +175,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
 });
 ```
 
-
-### 2.2 Set players' config
 Define the players' config and method variables:
 
 ```
@@ -207,8 +198,7 @@ var
     [...]
 ```
 
-### 2.3 Select either DASH or HLS source
-Check the browser type and select either DASH or HLS manifest.
+Check the browser type and select either DASH or HLS manifest:
 
 ```
 // Detect current browser and set media data.
@@ -222,8 +212,6 @@ if (browser === BROWSER.SAFARI) {
 }
 ```
 
-
-### 2.4 Create Bitmovin player
 Instantiate the Bitmovin player and load the media file:
 
 ```
@@ -235,15 +223,14 @@ var playerContainer = document.getElementById('player');
 ```
 
 
-# Step 3 
+## Step 3 
 Listen to `Ready` event and add markers on the seek bar.
 
 Documentation with all Bitmovin player events: https://bitmovin.com/docs/player/api-reference/web/web-sdk-api-reference-v8#/player/web/8/docs/enums/core_events.playerevent.html
 
 Documentation with all Bitmovin CSS classes: https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
 
-### 3.1 Listen to Ready event
-Attach an event handler on the player `Ready` event:
+Listen to player and media `Ready` event. Attach an event handler on the event:
 
 ```
 // When player and media have loaded, add markers on the seek bar
@@ -252,7 +239,6 @@ player.on(bitmovin.player.PlayerEvent.Ready, function () {
 });
 ```
 
-### 3.2 Create markers
 Define markers by cycling through the play events in the `items` key in the input.
 Set marker position in percentage of where the play event is with respect to the content duration:
 
@@ -265,9 +251,7 @@ function addMarkers (playEvents, contentDuration) {
 }
 ```
 
-
-### 3.3 Add created markers to the seek bar
-Update the UI visually by getting the reference to the seek bar markers `div` identified by class `bmpui-seekbar-markers`.
+Add the created markers to the seek bar. Update the UI visually by getting the reference to the seek bar markers `div` identified by class `bmpui-seekbar-markers`.
 Then create a new `span` element, this will be the marker and append it to the seek bar markers element:
 
 ```
@@ -283,12 +267,11 @@ function addSeekbarMarkerUI (position) {
 ```
 
 
-# Step 4
+## Step 4
 Listen to `TimeChanged` events and display a label with extra information if its near or on the highlighted event in the content.
 Documentation with all Bitmovin player events: https://bitmovin.com/docs/player/api-reference/web/web-sdk-api-reference-v8#/player/web/8/docs/enums/core_events.playerevent.html
 Documentation with all Bitmovin CSS classes: https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
 
-### 4.1 Handle TimeChanged events
 Listen to `TimeChanged` events and get the current playback time:
 
 ```
@@ -299,18 +282,14 @@ player.on(bitmovin.player.PlayerEvent.TimeChanged, function (event) {
 	[…]
 ```
 
-
-### 4.2 Create highlighted events in seconds
-Loop through the `items`' `play_event` key in the input:
+Create highlighted events in seconds by looping through the `items`' `play_event` key in the input:
 
 ```
 for (var i = 0; i < data.play_events.length; i++) {
     var playEvent = data.play_events[i];
 ```
 
-
-### 4.3 Handle whether to display a label in a specific time range
-Check if the current time is within `labelTimeRange` seconds either before or after the highlighted events' time.
+Handle whether to display a label in a specific time range. Check if the current time is within `labelTimeRange` seconds either before or after the highlighted events' time.
 If the current time is within the marker range, update the seek bar at the events’ time and pop up the control bar to show the label with extra metadata information.
 
 ```
@@ -336,11 +315,8 @@ if (Math.abs(currentTime - playEvent) < labelTimeRange) {
 ```
 
 
-### 4.4 Get references to Bitmovin seek bar elements
-Update the seek bar and show the label with the extra metadata information.
-
-Get the references to Bitmovin player UI elements:
-
+Get relevant player UI elements and update the seek bar to show the label with the extra metadata information.
+Define the references to Bitmovin player UI elements:
 ```
 var
     seekbarLabel = document.querySelector(CSS_CLASSES.SEEKBAR_LABEL),
@@ -376,8 +352,7 @@ if (seekbarLabel.className.indexOf(CSS_CLASSES.HIDDEN) === -1) {
 }
 ```
 
-
-# Step 5
+## Step 5
 Fire mouseover event to pop up the control bar when the label is displayed with the extra information. The control bar will fade out after 5 seconds of inactivity.
 The events available are: https://developer.mozilla.org/en-US/docs/Web/Events
 
