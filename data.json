@@ -1,0 +1,35 @@
+{
+    "title": "Lazio - Roma 3-0", 
+    "manifest": {
+        "dash": "http://localhost:5001/derby/dash/manifest.mpd",
+        "hls": "http://localhost:5001/derby/hls/index.m3u8"
+    },
+    "items": [
+        {
+            "text": "CURVA NORD (LAZIO)",
+            "play_event": 16.0,
+            "minute": 1
+        },
+        {
+            "text": "GOL CAICEDO (LAZIO)<br>1-0", 
+            "play_event": 92.0,
+            "minute": 12
+        }, 
+        {
+            "text": "RIGORE CORREA (LAZIO)<br>1-0", 
+            "play_event": 140.0,
+            "minute": 70
+        }, 
+        {
+            "text": "GOL IMMOBILE (LAZIO)<br>2-0",
+            "play_event": 151.0,
+            "minute": 73
+        },
+        {
+            "text": "GOL CATALDI (LAZIO)<br>3-0",
+            "play_event": 173.0,
+            "minute": 89
+        }
+        
+    ]
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="bitmovinplayer.js"></script>
+    <script type="text/javascript" src="extended-metadata-seekbar.js"></script>
+    <script type="text/javascript" src="bitmovinanalytics.min.js"></script>
+    <link rel="stylesheet" href="bootstrap.min.css" crossorigin="anonymous">
+    <title>Extended seekbar metadata example with Bitmovin player.</title>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="section">
+            <div class="row">
+                <div class="col-12">
+                    <b>Extended seekbar metadata example with Bitmovin player.</b>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="col-6">
+                        <b>Browser: </b><div id="browser" style="display:inline"></div>
+                    </div>
+                    <div class="col-6">
+                        <b>Codec: </b><div id="codec" style="display:inline"></div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <b>Media URL: </b><div id="media" style="display:inline"></div>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <div id="player"></div>
+        </div>
+        <div class="section">
+            <div id="title"></div>
+        </div>
+    </div>
+    
+</body>
+</html>
