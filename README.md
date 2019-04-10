@@ -1,7 +1,7 @@
 
 
 
-# Modify bitmovin player to handle metadata during playback in 5 steps
+# Modify Bitmovin player to handle metadata during playback in 5 steps
 
 The goal of this tutorial is to modify the Bitmovin player seek bar adding extra, seekable highlighted events in the content, using JS/CSS and HTML. 
 There are 5 steps to follow:
@@ -286,7 +286,9 @@ seekbarControlBar.dispatchEvent(event);
 
 
 # Demo and code
-See the code in action at: https://s3.amazonaws.com/test-videos-samples/index.html, the video used is from Lazio - Roma 3 - 0 last March.
+See the code in action at: https://s3.amazonaws.com/test-videos-samples/index.html
+
+The video used is from Lazio - roma 3 - 0, last March.
 
 The full code is available here: https://github.com/andrea-f/bitmovin-player-augment-seekbar-metadata
 
