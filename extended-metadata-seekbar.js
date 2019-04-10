@@ -180,7 +180,7 @@ function loadData (url) {
 /**
  * @description Adds all play events from input data as seekbar markers.
  * @param {Array} items 
- * @param {Float} contentDuration 
+ * @param {Number} contentDuration 
  */
 function addMarkers (items, contentDuration) {
     for (var i = 0; i < items.length; i++) {
