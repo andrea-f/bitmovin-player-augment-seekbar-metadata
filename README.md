@@ -268,7 +268,7 @@ seekbarLabelTitle.innerHTML = '';
 ```
 
 ## Step 5
-Fire mouseover event to pop up the control bar when the label is displayed with the extra information. The control bar will fade out after 5 seconds of inactivity. The events available are: https://developer.mozilla.org/en-US/docs/Web/Events
+Fire `mouseenter` event to pop up the control bar when the label is displayed with the extra information. The control bar will fade out after 5 seconds of inactivity. The events available are: https://developer.mozilla.org/en-US/docs/Web/Events
 
 Create a new event in `updateSeekbarUI`:
 
