@@ -14,7 +14,7 @@ There are 5 steps to follow:
 
 4. Listen to `TimeChanged` events and display a label with extra information if its near or on the highlighted event in the content.
 
-5. Fire mouseover event when the label is displayed to show the control bar with the highlighted event.
+5. Fire `mouseenter` event when the label is displayed to show the control bar with the highlighted event.
 
 The **demo** of the tutorial is at: https://s3.amazonaws.com/test-videos-samples/index.html
 
