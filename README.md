@@ -49,7 +49,6 @@ Create DASH manifest, using Shaka Packager:
 Once the video has been encoded and packaged, serve the content locally from `localhost` or upload the content on S3 (make sure to set CORS accordingly to accept all headers otherwise for audio and video files it will result in a CORS error).
 In permissions, set CORS configuration for bucket:
 
-
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
@@ -82,27 +81,7 @@ Create the input config. Define an object, in `data.json` containing  the extra 
             "play_event": 16.0,
             "minute": 1
         },
-        {
-            "text": "GOL CAICEDO (LAZIO)<br>1-0", 
-            "play_event": 92.0,
-            "minute": 12
-        }, 
-        {
-            "text": "RIGORE CORREA (LAZIO)<br>1-0", 
-            "play_event": 141.0,
-            "minute": 70
-        }, 
-        {
-            "text": "GOL IMMOBILE (LAZIO)<br>2-0",
-            "play_event": 153.0,
-            "minute": 73
-        },
-        {
-            "text": "GOL CATALDI (LAZIO)<br>3-0",
-            "play_event": 174.0,
-            "minute": 89
-        }
-        
+        [...]
     ]
 }
 ```
@@ -118,11 +97,9 @@ In a separate file, `bitmovin_credentials.json`, place the Bitmovin API License 
 }
 ```
 
-Reference Bitmovin player UI CSS classes to handle interacting with the players' UI and adding highlighted timeline events:
+Reference Bitmovin player UI CSS classes (https://bitmovin.com/docs/player/articles/player-ui-css-class-reference) to handle interacting with the players' UI and adding highlighted timeline events:
 
 ```
-// Bitmovin CSS UI classes
-// Docs at https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
 var CSS_CLASSES = {
     MARKERS: '.bmpui-seekbar-markers',
     MARKER: 'bmpui-seekbar-marker',
@@ -137,32 +114,20 @@ var CSS_CLASSES = {
 Call the main method `loadBitmovinPlayerWithConfig` with the loaded input data and Bitmovin credentials, after DOM loaded event:
 
 ```
-// Run when DOM is ready
 document.addEventListener("DOMContentLoaded", function (event) {
-    // Load the input data
     loadData(jsonData).then( data => {
-        // Then the players' config credentials
         loadData(bitmovinCredentials).then( credentials => {
             data.bitmovin_credentials = credentials;
-            // Then the player with the extended metadata in the seek bar
             loadBitmovinPlayerWithConfig(data);
-        }).catch(err => {
-            console.log('ERROR:', err.error);
         })
-    }).catch( err => {
-        console.log('ERROR:', err.error);
-    })
-});
+        [...]
 ```
 
 Define the players' config and method variables:
 
 ```
 var 
-    browserInfo = getBrowser(),
-    browser = browserInfo.browser,
-    version = browserInfo.version,
-    // Bitmovin player config
+    [...]
     config = {
         key: data.bitmovin_credentials.license_key,
         analytics: {
@@ -181,39 +146,29 @@ var
 Check the browser type and select either DASH or HLS manifest:
 
 ```
-// Detect current browser and set media data.
 if (browser === BROWSER.SAFARI) {
-    // Use HLS
     media.hls = data.manifest.hls;
-    // Replace Version string with Safari.
-    browser = 'Safari';
 } else {
     media.dash = data.manifest.dash;
 }
 ```
 
-Instantiate the Bitmovin player and load the media file:
+Instantiate the Bitmovin player with the Analytics module and load the media file:
 
 ```
 var playerContainer = document.getElementById('player');
     bitmovin.player.Player.addModule(bitmovin.analytics.PlayerModule);
     player = new bitmovin.player.Player(playerContainer, config);
-    // Load media in the Bitmovin player 
     player.load(media);
 ```
 
-
 ## Step 3 
 Listen to `Ready` event and add markers on the seek bar.
-
 Documentation with all Bitmovin player events: https://bitmovin.com/docs/player/api-reference/web/web-sdk-api-reference-v8#/player/web/8/docs/enums/core_events.playerevent.html
 
-Documentation with all Bitmovin CSS classes: https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
-
-Listen to player and media `Ready` event. Attach an event handler on the event:
+Listen to `Ready` event, fired when player and media have loaded. Attach an event handler on the event:
 
 ```
-// When player and media have loaded, add markers on the seek bar
 player.on(bitmovin.player.PlayerEvent.Ready, function () {
     addMarkers(data.play_events, player.getDuration());
 });
@@ -248,9 +203,7 @@ function addSeekbarMarkerUI (position) {
 
 
 ## Step 4
-Listen to `TimeChanged` events and display a label with extra information if its near or on the highlighted event in the content.
-Documentation with all Bitmovin player events: https://bitmovin.com/docs/player/api-reference/web/web-sdk-api-reference-v8#/player/web/8/docs/enums/core_events.playerevent.html
-Documentation with all Bitmovin CSS classes: https://bitmovin.com/docs/player/articles/player-ui-css-class-reference
+Display a label with extra information if the current playback time is near or on the highlighted event in the content.
 
 Listen to `TimeChanged` events and get the current playback time:
 
@@ -268,8 +221,6 @@ If the current time is within the marker range, update the seek bar and pop up t
 ```
 for (var i = 0; i < data.items.length; i++) {
     var playEvent = data.items[i].play_event;
-    // If the current time is within `labelTimeRange` of a seekable event
-    // show the label and update the UI before and after the play event.
     if (Math.abs(currentTime - playEvent) < labelTimeRange) {
         var
             seekBarLabelPosition = (playEvent * 100) / player.getDuration(),
@@ -279,17 +230,10 @@ for (var i = 0; i < data.items.length; i++) {
                 text: data.items[i].text
             };
         showingLabel = true;
-        // Update the seek bar ui for the whole time the play event is displayed
-        // So hover event keeps firing and seek bar is shown to the user
         updateSeekbarUI(seekBarLabelConfig);
         break;
     } else {
-        if (showingLabel === true) {
-            updateSeekbarUI();
-            showingLabel = false; 
-            }
-        }
-    }
+    [...]
 });
 ```
 
@@ -303,8 +247,6 @@ var
     seekbarLabelTime = document.querySelector(CSS_CLASSES.SEEKBAR_LABEL_TIME),
     seekbarControlBar = document.querySelector(CSS_CLASSES.CONTROLBAR);
 ```
-
-    
 If `seekbarLabelConfig` is defined, the seek bar UI is updated with a label:
 
 ```
@@ -313,27 +255,20 @@ var
     seekbarLabelPosition = seekbarLabelConfig.labelPosition,
     playEvent = seekbarLabelConfig.playEvent,
     […]
-// Show the seek bar label and set the text in the title
 seekbarLabel.style.left = seekbarLabelPosition + "%";
 seekbarLabel.classList.remove(CSS_CLASSES.HIDDEN);
 seekbarLabelTitle.innerHTML = text;
 seekbarLabelTime.innerHTML = playEvent + "'";
 ```
-
-The class `bmpui-hidden` is removed to show the label.
-
 If `seekbarLabelConfig` is not defined, the label is hidden and the text cleared:
 
 ```
-if (seekbarLabel.className.indexOf(CSS_CLASSES.HIDDEN) === -1) {
-    seekbarLabel.className += ' ' + CSS_CLASSES.HIDDEN;
-    seekbarLabelTitle.innerHTML = '';
-}
+seekbarLabel.className += ' ' + CSS_CLASSES.HIDDEN;
+seekbarLabelTitle.innerHTML = '';
 ```
 
 ## Step 5
-Fire mouseover event to pop up the control bar when the label is displayed with the extra information. The control bar will fade out after 5 seconds of inactivity.
-The events available are: https://developer.mozilla.org/en-US/docs/Web/Events
+Fire mouseover event to pop up the control bar when the label is displayed with the extra information. The control bar will fade out after 5 seconds of inactivity. The events available are: https://developer.mozilla.org/en-US/docs/Web/Events
 
 Create a new event in `updateSeekbarUI`:
 
@@ -343,7 +278,6 @@ var event = new Event('mouseenter', {
     cancelable: true
 });
 ```
-
 Dispatch the event from `updateSeekbarUI` while the label is displayed: 
 
 ```
