@@ -286,6 +286,10 @@ seekbarControlBar.dispatchEvent(event);
 
 
 # Demo and code
+![alt text](https://i.ibb.co/xsyShNz/Screenshot-2020-02-13-at-16-56-37.png)
+![alt text](https://i.ibb.co/qN5TW3h/Screenshot-2020-02-13-at-16-59-26.png)
+![alt text](https://i.ibb.co/y8gpP4v/Screenshot-2020-02-13-at-17-00-22.png)
+
 See the code in action at: https://s3.amazonaws.com/test-videos-samples/index.html
 
 The video used is from Lazio - roma 3 - 0, last March.
